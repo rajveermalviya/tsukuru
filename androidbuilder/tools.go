@@ -12,6 +12,8 @@ func getName(tool string) string {
 		return "java.exe"
 	case "javac":
 		return "javac.exe"
+	case "jar":
+		return "jar.exe"
 	case "keytool":
 		return "keytool.exe"
 	case "aapt2":
