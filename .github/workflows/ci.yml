@@ -44,16 +44,15 @@ jobs:
 
           tsukuru build apk github.com/rajveermalviya/tsukuru/examples/android-deps;
           tsukuru build apk github.com/rajveermalviya/tsukuru/examples/android-nodeps;
-          tsukuru -androidbackend=custom build apk github.com/rajveermalviya/tsukuru/examples/android-nodeps;
+          tsukuru build apk -androidbackend=custom github.com/rajveermalviya/tsukuru/examples/android-nodeps;
 
           tsukuru build appbundle github.com/rajveermalviya/tsukuru/examples/android-deps;
           tsukuru build appbundle github.com/rajveermalviya/tsukuru/examples/android-nodeps;
 
-          tsukuru -release build apk github.com/rajveermalviya/tsukuru/examples/android-deps;
-          tsukuru -release build apk github.com/rajveermalviya/tsukuru/examples/android-nodeps;
-          tsukuru -release -androidbackend=custom build apk github.com/rajveermalviya/tsukuru/examples/android-nodeps;
+          tsukuru build apk -release github.com/rajveermalviya/tsukuru/examples/android-deps;
+          tsukuru build apk -release github.com/rajveermalviya/tsukuru/examples/android-nodeps;
 
-          tsukuru -release build appbundle github.com/rajveermalviya/tsukuru/examples/android-deps;
-          tsukuru -release build appbundle github.com/rajveermalviya/tsukuru/examples/android-nodeps;
+          tsukuru build appbundle -release github.com/rajveermalviya/tsukuru/examples/android-deps;
+          tsukuru build appbundle -release github.com/rajveermalviya/tsukuru/examples/android-nodeps;
 
         shell: bash

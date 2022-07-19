@@ -9,4 +9,4 @@ Go's default build system (aka `go build`) is great but some deployment targets 
 
 - `gradle` (recommended)
 
-- `custom` (experimental) : custom backend can build apks without running gradle, though it is limited in many cases. It doesn't support building appbundle and android dependencies.
+- `custom` (experimental) : custom backend can build apks without running gradle, though it is limited in many cases. It doesn't support building appbundle and doesn't support building apps with android dependencies.
