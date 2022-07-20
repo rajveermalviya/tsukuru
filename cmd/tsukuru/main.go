@@ -29,6 +29,8 @@ var (
 	release        bool
 	download       bool
 	goarches       string
+	x              bool
+	a              bool
 )
 
 var (
@@ -54,6 +56,8 @@ func init() {
 		c.BoolVar(&release, "release", false, "currently ignored by \"custom\" backend")
 		c.BoolVar(&download, "download", true, "automatically download missing sdks")
 		c.StringVar(&goarches, "goarches", "arm64,arm,amd64,386", "comma separated list (no spaces) of GOARCH to include in apk")
+		c.BoolVar(&x, "x", false, "")
+		c.BoolVar(&a, "a", false, "")
 	}
 
 	for _, c := range []*flag.FlagSet{buildApkCmd, buildAppbundleCmd} {
@@ -152,43 +156,43 @@ func buildAndroid(mainPackagePath string, targetType string) string {
 	}
 
 	type abiForCompiler struct {
-		abi      string
-		compiler string
+		abi    string
+		target string
 	}
 
 	goarchesSlice := strings.Split(goarches, ",")
 
 	abis := map[string]abiForCompiler{
 		"arm": {
-			abi:      "armeabi-v7a",
-			compiler: "armv7a-linux-androideabi",
+			abi:    "armeabi-v7a",
+			target: "armv7-none-linux-androideabi",
 		},
 		"arm64": {
-			abi:      "arm64-v8a",
-			compiler: "aarch64-linux-android",
+			abi:    "arm64-v8a",
+			target: "aarch64-none-linux-android",
 		},
 		"386": {
-			abi:      "x86",
-			compiler: "i686-linux-android",
+			abi:    "x86",
+			target: "i686-none-linux-android",
 		},
 		"amd64": {
-			abi:      "x86_64",
-			compiler: "x86_64-linux-android",
+			abi:    "x86_64",
+			target: "x86_64-none-linux-android",
 		},
 	}
 
-	if !release {
+	if release {
 		ldflags += " -s -w"
 	}
 
-	toolchain := ""
+	toolchainOS := ""
 	switch runtime.GOOS {
 	case "windows":
-		toolchain = "windows-x86_64"
+		toolchainOS = "windows-x86_64"
 	case "darwin":
-		toolchain = "darwin-x86_64"
+		toolchainOS = "darwin-x86_64"
 	case "linux":
-		toolchain = "linux-x86_64"
+		toolchainOS = "linux-x86_64"
 	default:
 		panic("invalid GOOS")
 	}
@@ -202,17 +206,28 @@ func buildAndroid(mainPackagePath string, targetType string) string {
 			continue
 		}
 
-		cc := filepath.Join(ndkDir, "toolchains", "llvm", "prebuilt", toolchain, "bin", abi.compiler+minSdk+"-clang")
+		cc := filepath.Join(ndkDir, "toolchains", "llvm", "prebuilt", toolchainOS, "bin", "clang")
 		cxx := cc + "++"
 
-		args := []string{
-			"build",
+		gccToolchain := filepath.Join(ndkDir, "toolchains", "llvm", "prebuilt", toolchainOS)
+		sysroot := filepath.Join(ndkDir, "toolchains", "llvm", "prebuilt", toolchainOS, "sysroot")
+
+		ccEnv := cc + " --target=" + abi.target + minSdk + " --gcc-toolchain=" + gccToolchain + " --sysroot=" + sysroot
+		cxxEnv := cxx + " --target=" + abi.target + minSdk + " --gcc-toolchain=" + gccToolchain + " --sysroot=" + sysroot
+
+		args := []string{"build"}
+		if x {
+			args = append(args, "-x")
+		}
+		if a {
+			args = append(args, "-a")
+		}
+		args = append(args,
 			"-buildmode", "c-shared",
 			"-o", libPath,
 			"-ldflags", ldflags,
-		}
-
-		args = append(args, mainPackagePath)
+			mainPackagePath,
+		)
 
 		cmd := exec.Command("go", args...)
 		cmd.Env = append(
@@ -220,13 +235,14 @@ func buildAndroid(mainPackagePath string, targetType string) string {
 			"CGO_ENABLED=1",
 			"GOOS=android",
 			"GOARCH="+goarch,
-			"CC="+cc,
-			"CXX="+cxx,
+			"CC="+ccEnv,
+			"CXX="+cxxEnv,
 		)
 		fmt.Println(cmd.String())
-		out, err := cmd.CombinedOutput()
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+		err := cmd.Run()
 		if err != nil {
-			os.Stderr.Write(out)
 			panic(err)
 		}
 
