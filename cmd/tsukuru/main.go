@@ -44,8 +44,9 @@ var (
 func init() {
 	flag.Usage = func() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of tsukuru:\n\n")
-		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru build [-options] {apk, appbundle} <path to main package>\n\n")
-		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru run [-options] apk <path to main package>\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru build {apk, appbundle} [-options] <path to main package>\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru run apk [-options] <path to main package>\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "Run 'tsukuru [command] [subcommand] -help' for details\n\n")
 		flag.PrintDefaults()
 	}
 
