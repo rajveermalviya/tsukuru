@@ -16,9 +16,6 @@ Usage of tsukuru:
 Run 'tsukuru [command] [subcommand] -help' for details
 ```
 
-### But how does it differ from `gomobile`?
-
-`tsukuru` doesn't generate android source code by itself, it instead requires an `android` directory that contains all the java/kotlin code. This make it possible to add android dependencies and supporting `androidx` libraries. So `tsukuru` is much more flexible than `gomobile`.
 
 # backends
 `tsukuru` currently has two backends for android build system.
