@@ -31,6 +31,8 @@ var (
 	goarches       string
 	x              bool
 	a              bool
+	race           bool
+	tags           string
 )
 
 var (
@@ -58,6 +60,8 @@ func init() {
 		c.StringVar(&goarches, "goarches", "arm64,arm,amd64,386", "comma separated list (no spaces) of GOARCH to include in apk")
 		c.BoolVar(&x, "x", false, "")
 		c.BoolVar(&a, "a", false, "")
+		c.BoolVar(&race, "race", false, "")
+		c.StringVar(&tags, "tags", "", "")
 	}
 
 	for _, c := range []*flag.FlagSet{buildApkCmd, buildAppbundleCmd} {
@@ -215,17 +219,28 @@ func buildAndroid(mainPackagePath string, targetType string) string {
 		ccEnv := cc + " --target=" + abi.target + minSdk + " --gcc-toolchain=" + gccToolchain + " --sysroot=" + sysroot
 		cxxEnv := cxx + " --target=" + abi.target + minSdk + " --gcc-toolchain=" + gccToolchain + " --sysroot=" + sysroot
 
-		args := []string{"build"}
+		args := []string{
+			"build",
+			"-trimpath",
+			"-buildmode", "c-shared",
+		}
+		if ldflags != "" {
+			args = append(args, "-ldflags", ldflags)
+		}
 		if x {
 			args = append(args, "-x")
 		}
 		if a {
 			args = append(args, "-a")
 		}
+		if race {
+			args = append(args, "-race")
+		}
+		if tags != "" {
+			args = append(args, "-tags", tags)
+		}
 		args = append(args,
-			"-buildmode", "c-shared",
 			"-o", libPath,
-			"-ldflags", ldflags,
 			mainPackagePath,
 		)
 
@@ -238,6 +253,9 @@ func buildAndroid(mainPackagePath string, targetType string) string {
 			"CC="+ccEnv,
 			"CXX="+cxxEnv,
 		)
+		if goarch == "arm" {
+			cmd.Env = append(cmd.Env, "GOARM=7")
+		}
 		fmt.Println(cmd.String())
 		cmd.Stderr = os.Stderr
 		cmd.Stdout = os.Stdout
@@ -372,7 +390,10 @@ func runAndroid(apk string) {
 			panic(err)
 		}
 
-		pid = strings.TrimSpace(string(out))
+		pids := strings.Split(strings.TrimSpace(string(out)), " ")
+		if len(pids) > 0 {
+			pid = pids[0]
+		}
 	}
 
 	if pid == "" {
