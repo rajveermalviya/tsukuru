@@ -33,12 +33,14 @@ var (
 	a              bool
 	race           bool
 	tags           string
+	skipcheckin    bool
 )
 
 var (
 	buildApkCmd       = flag.NewFlagSet("tsukuru build apk", flag.ExitOnError)
 	buildAppbundleCmd = flag.NewFlagSet("tsukuru build appbundle", flag.ExitOnError)
 	runApkCmd         = flag.NewFlagSet("tsukuru run apk", flag.ExitOnError)
+	checkinCmd        = flag.NewFlagSet("checkin deps", flag.ExitOnError)
 )
 
 func init() {
@@ -46,6 +48,7 @@ func init() {
 		fmt.Fprintf(flag.CommandLine.Output(), "Usage of tsukuru:\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru build {apk, appbundle} [-options] <path to main package>\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru run apk [-options] <path to main package>\n\n")
+		fmt.Fprintf(flag.CommandLine.Output(), "\ttsukuru checkin deps [-options] <path to main package>\n\n")
 		fmt.Fprintf(flag.CommandLine.Output(), "Run 'tsukuru [command] [subcommand] -help' for details\n\n")
 		flag.PrintDefaults()
 	}
@@ -63,6 +66,7 @@ func init() {
 		c.BoolVar(&a, "a", false, "")
 		c.BoolVar(&race, "race", false, "")
 		c.StringVar(&tags, "tags", "", "")
+		c.BoolVar(&skipcheckin, "skipcheckin", false, "")
 	}
 
 	for _, c := range []*flag.FlagSet{buildApkCmd, buildAppbundleCmd} {
@@ -80,23 +84,27 @@ func main() {
 		fail()
 	}
 
-	cmdType := os.Args[1]
-	targetType := os.Args[2]
+	mainCmd := os.Args[1]
+	subCmd := os.Args[2]
 
 	var mainPackagePath string
 
 	switch {
-	case cmdType == "build" && targetType == "apk":
+	case mainCmd == "build" && subCmd == "apk":
 		buildApkCmd.Parse(os.Args[3:])
 		mainPackagePath = buildApkCmd.Arg(0)
 
-	case cmdType == "build" && targetType == "appbundle":
+	case mainCmd == "build" && subCmd == "appbundle":
 		buildAppbundleCmd.Parse(os.Args[3:])
 		mainPackagePath = buildAppbundleCmd.Arg(0)
 
-	case cmdType == "run" && targetType == "apk":
+	case mainCmd == "run" && subCmd == "apk":
 		runApkCmd.Parse(os.Args[3:])
 		mainPackagePath = runApkCmd.Arg(0)
+
+	case mainCmd == "checkin" && subCmd == "deps":
+		checkinCmd.Parse(os.Args[3:])
+		mainPackagePath = checkinCmd.Arg(0)
 
 	default:
 		fail()
@@ -121,10 +129,28 @@ func main() {
 		androidDir = filepath.Join(mainPackagePath, "android")
 	}
 
-	out := buildAndroid(mainPackagePath, targetType)
+	switch {
+	case buildApkCmd.Parsed():
+		if !skipcheckin {
+			checkin(mainPackagePath)
+		}
+		buildAndroid(mainPackagePath, "apk")
 
-	if runApkCmd.Parsed() {
+	case buildAppbundleCmd.Parsed():
+		if !skipcheckin {
+			checkin(mainPackagePath)
+		}
+		buildAndroid(mainPackagePath, "appbundle")
+
+	case runApkCmd.Parsed():
+		if !skipcheckin {
+			checkin(mainPackagePath)
+		}
+		out := buildAndroid(mainPackagePath, "apk")
 		runAndroid(out)
+
+	case checkinCmd.Parsed():
+		checkin(mainPackagePath)
 	}
 }
 

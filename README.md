@@ -1,6 +1,6 @@
 # `tsukuru`: build more than just a binary
 
-Tsukuru is a library that can build apk and appbundle for deploying Go apps on android platforms.
+Tsukuru is a cli and a library that can build apk and appbundle for deploying Go apps on android platforms.
 
 ```
 ~ go install github.com/rajveermalviya/tsukuru@latest
@@ -13,9 +13,10 @@ Usage of tsukuru:
 
         tsukuru run apk [-options] <path to main package>
 
+        tsukuru checkin deps [-options] <path to main package>
+
 Run 'tsukuru [command] [subcommand] -help' for details
 ```
-
 
 # backends
 `tsukuru` currently has two backends for android build system.
@@ -23,3 +24,17 @@ Run 'tsukuru [command] [subcommand] -help' for details
 - `gradle` (recommended)
 
 - `custom` (experimental) : custom backend can build apks without running gradle, though it is limited in many cases (doesn't support building appbundle, doesn't support building apps with android dependencies)
+
+# `tsukurufile` (experimental)
+
+`tsukurufile` can be used to specify android dependencies for a go package
+
+```go
+tsukuru v1alpha
+
+android (
+    "androidx.games:games-activity:1.2.1"
+)
+```
+
+`tsukuru` walks through each imported package's directory and tries to find a `tsukurufile`, then it deduplicates any duplicate dependencies between different `tsukurufile`'s (currently doesn't do any version management), then it adds the unique list of dependencies to your `./android/app/build.gradle` file.
