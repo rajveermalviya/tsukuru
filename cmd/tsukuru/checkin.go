@@ -147,6 +147,10 @@ func getDependenciesFromBuildGradle() ([]string, error) {
 		line := s.Text()
 		trimmedLine := strings.TrimSpace(line)
 
+		if isDependenciesBlock && strings.HasSuffix(trimmedLine, "// added by tsukuru; DO NOT REMOVE THIS COMMENT") {
+			continue
+		}
+
 		if !isDependenciesBlock &&
 			(strings.HasPrefix(trimmedLine, "dependencies {") ||
 				strings.HasPrefix(trimmedLine, "dependencies{")) {
@@ -240,6 +244,10 @@ func writeDependenciesToBuildGradle(dependencies []string) error {
 			(strings.HasPrefix(trimmedLine, "dependencies {") ||
 				strings.HasPrefix(trimmedLine, "dependencies{")) {
 			isDependenciesBlock = true
+		}
+
+		if isDependenciesBlock && strings.HasSuffix(trimmedLine, "// added by tsukuru; DO NOT REMOVE THIS COMMENT") {
+			continue
 		}
 
 		if isDependenciesBlock && strings.HasPrefix(trimmedLine, "}") {
