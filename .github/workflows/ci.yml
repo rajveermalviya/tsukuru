@@ -55,4 +55,7 @@ jobs:
           tsukuru build appbundle -release github.com/rajveermalviya/tsukuru/examples/android-deps;
           tsukuru build appbundle -release github.com/rajveermalviya/tsukuru/examples/android-nodeps;
 
+          tsukuru build wasm github.com/rajveermalviya/tsukuru/examples/wasm;
+          tsukuru build wasm -release github.com/rajveermalviya/tsukuru/examples/wasm;
+
         shell: bash

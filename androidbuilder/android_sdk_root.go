@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 )
 
@@ -95,10 +94,7 @@ func downloadAndroidBuildtools(androidSdkRoot, targetSdkVersion string) (string,
 	}
 
 	// if found install it via sdkmanager
-	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", "sdkmanager")
-	if runtime.GOOS == "windows" {
-		sdkmanager += ".bat"
-	}
+	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", getName("sdkmanager"))
 	cmd := exec.Command(sdkmanager, "build-tools;"+latestVersion)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -174,10 +170,7 @@ func findAndroidPlatform(androidSdkRoot, targetSdkVersion string) (string, error
 }
 
 func downloadAndroidPlatform(androidSdkRoot, targetSdkVersion string) (string, error) {
-	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", "sdkmanager")
-	if runtime.GOOS == "windows" {
-		sdkmanager += ".bat"
-	}
+	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", getName("sdkmanager"))
 	cmd := exec.Command(sdkmanager, "platforms;android-"+targetSdkVersion)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 )
 
 func HasNdk(androidSdkRoot string) bool {
@@ -41,10 +40,7 @@ func FindLatestVersionOfNdkInstalled(androidSdkRoot string) string {
 
 // ndkVersion should be "major.minor.micro" not "ndk;major.minor.micro"
 func DownloadNdk(androidSdkRoot, version string) error {
-	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", "sdkmanager")
-	if runtime.GOOS == "windows" {
-		sdkmanager += ".bat"
-	}
+	sdkmanager := filepath.Join(androidSdkRoot, "cmdline-tools", "latest", "bin", getName("sdkmanager"))
 	cmd := exec.Command(sdkmanager, "ndk;"+version)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

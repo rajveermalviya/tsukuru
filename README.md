@@ -1,6 +1,6 @@
 # `tsukuru`: build more than just a binary
 
-Tsukuru is a cli and a library that can build apk and appbundle for deploying Go apps on android platforms.
+Tsukuru is a cli tool that can build and run apk and appbundle for deploying Go apps on android platforms, and wasm for web targets.
 
 ```
 ~ go install github.com/rajveermalviya/tsukuru@latest
@@ -9,16 +9,16 @@ Tsukuru is a cli and a library that can build apk and appbundle for deploying Go
 
 Usage of tsukuru:
 
-        tsukuru build {apk, appbundle} [-options] <path to main package>
+        tsukuru build {apk, appbundle, wasm} [-options] <path to main package>
 
-        tsukuru run apk [-options] <path to main package>
+        tsukuru run {apk, wasm} [-options] <path to main package>
 
         tsukuru checkin deps [-options] <path to main package>
 
 Run 'tsukuru [command] [subcommand] -help' for details
 ```
 
-# backends
+# android backends
 `tsukuru` currently has two backends for android build system.
 
 - `gradle` (recommended)

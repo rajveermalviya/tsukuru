@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 )
 
 type GradleBuilder struct{}
@@ -46,11 +45,7 @@ func (b *GradleBuilder) BuildApk(androidDir string, opts ...GradleBuildApkOption
 		opt(options)
 	}
 
-	gradlewScript := "gradlew"
-	if runtime.GOOS == "windows" {
-		gradlewScript = "gradlew.bat"
-	}
-	gradlew := filepath.Join(androidDir, gradlewScript)
+	gradlew := filepath.Join(androidDir, getName("gradlew"))
 
 	_, err := os.Stat(gradlew)
 	if err != nil {
@@ -108,11 +103,7 @@ func (b *GradleBuilder) BuildAppbundle(androidDir string, opts ...GradleBuildApk
 		opt(options)
 	}
 
-	gradlewScript := "gradlew"
-	if runtime.GOOS == "windows" {
-		gradlewScript = "gradlew.bat"
-	}
-	gradlew := filepath.Join(androidDir, gradlewScript)
+	gradlew := filepath.Join(androidDir, getName("gradlew"))
 
 	_, err := os.Stat(gradlew)
 	if err != nil {
