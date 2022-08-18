@@ -9,8 +9,8 @@ import (
 	"strings"
 )
 
-func buildWasm(mainPackagePath string) string {
-	wasmPath := filepath.Join("target", "wasm", "main.wasm")
+func buildWasm(mainPackagePath string, out string) string {
+	wasmPath := filepath.Join("target", "wasm", out)
 	_ = os.RemoveAll(filepath.Dir(wasmPath))
 
 	if release {

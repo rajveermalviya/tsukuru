@@ -164,10 +164,10 @@ func main() {
 		runAndroid(out)
 
 	case buildWasmCmd.Parsed():
-		_ = buildWasm(mainPackagePath)
+		_ = buildWasm(mainPackagePath, "main.wasm")
 
 	case runWasmCmd.Parsed():
-		out := buildWasm(mainPackagePath)
+		out := buildWasm(mainPackagePath, "test.wasm")
 		runWasm(out)
 
 	case checkinCmd.Parsed():
