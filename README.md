@@ -3,7 +3,7 @@
 Tsukuru is a cli tool that can build and run apk and appbundle for deploying Go apps on android platforms, and wasm for web targets.
 
 ```
-~ go install github.com/rajveermalviya/tsukuru@latest
+~ go install github.com/rajveermalviya/tsukuru/cmd/tsukuru@latest
 
 ~ tsukuru -help
 
